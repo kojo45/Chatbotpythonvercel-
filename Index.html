@@ -50,7 +50,7 @@ document.getElementById('send-btn').addEventListener('click', function() {
   if (userInput.trim() === '') return;
   appendMessage('user', userInput);
   document.getElementById('user-input').value = '';
-  fetch('https://votre-backend.vercel.app/api/main.py', {
+  fetch('https://votre-backend.vercel.app/api/main', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({ message: userInput })
