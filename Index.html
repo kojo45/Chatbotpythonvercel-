@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <style>
+    #chat-container { max-width: 400px; margin: 2rem auto; border: 1px solid #ccc; padding:1rem; min-height: 200px; font-family: sans-serif;}
+    .message.user { text-align: right; color: blue;}
+    .message.bot { text-align: left; color: green;}
+    #user-input { width: 70%; }
+    #send-btn   { width: 20%; }
+  </style>
+</head>
+<body>
+<div id="chat-container"></div>
+<input id="user-input" type="text" placeholder="Votre message..."/>
+<button id="send-btn">Envoyer</button>
+
+<script>
+function appendMessage(sender, message) {
+  const chatContainer = document.getElementById('chat-container');
+  const messageDiv = document.createElement('div');
+  messageDiv.classList.add('message', sender);
+  messageDiv.textContent = message;
+  chatContainer.appendChild(messageDiv);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// Effet dactylographie pour la réponse du bot
+function typeWriterEffect(text, callback) {
+  const chatContainer = document.getElementById('chat-container');
+  const messageDiv = document.createElement('div');
+  messageDiv.classList.add('message', 'bot');
+  chatContainer.appendChild(messageDiv);
+  let i = 0;
+  function type() {
+    if (i < text.length) {
+      messageDiv.textContent += text.charAt(i);
+      i++;
+      setTimeout(type, 30);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    } else if (callback) {
+      callback();
+    }
+  }
+  type();
+}
+
+document.getElementById('send-btn').addEventListener('click', function() {
+  const userInput = document.getElementById('user-input').value;
+  if (userInput.trim() === '') return;
+  appendMessage('user', userInput);
+  document.getElementById('user-input').value = '';
+  fetch('https://votre-backend.vercel.app/api/chatbot', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ message: userInput })
+  })
+  .then(response => response.json())
+  .then(data => {
+    // Afficher la réponse du chatbot avec effet dactylographie
+    typeWriterEffect(data.response);
+  });
+});
+</script>
+</body>
+</html>
